@@ -17,8 +17,7 @@ export const SearchInput = () => {
     (evt) => {
       if (evt.key === 'Enter') {
         console.log('Submit!');
-        localStore?.updateStoreState({ query: inputText }); // TODO: this should happen by dispatch fn (update rather than full overwrite)
-        // setSubmittedText(inputText);
+        localStore?.mutate('setQuery', { query: inputText });
       }
     },
     [localStore, inputText]
@@ -37,6 +36,7 @@ export const SearchInput = () => {
         onKeyDown={handleKeyDown}
         value={inputText ?? ''}
       />
+      <button onClick={() => localStore?.mutate('resetQuery', {})}>Reset</button>
       <div>Current Query: {localStore.storeState.query}</div>
     </div>
   );

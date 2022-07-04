@@ -1,17 +1,17 @@
 export type SubscriptionId = number & { __type: 'SubscriptionId' };
-export type Reducer<StoreState> = (storeState: StoreState) => StoreState;
 export type StoreChangedHandler<StoreState> = (storeState: StoreState) => void;
-
-export class SimpleStore<StoreState> {
+export type MutatorsBaseType<StoreState> = {[k: string]: (state: StoreState) => (payload: any) => StoreState};
+export type GetMutatorFn<StoreState, Mutators extends MutatorsBaseType<StoreState>> = (mutatorName: keyof Mutators) => ((payload: Parameters<ReturnType<Mutators[typeof mutatorName]>>[0]) => void);
+export class SimpleStore<StoreState, Mutators extends MutatorsBaseType<StoreState>> {
 
   private state: StoreState;
-  private reducer: Reducer<StoreState>;
+  private mutators: Mutators;
   private nextSubscriptionId: SubscriptionId = 1 as SubscriptionId;
   private subscriptions: Map<SubscriptionId, StoreChangedHandler<StoreState>> = new Map();
 
-  constructor(initialStore: StoreState, reducer: Reducer<StoreState>) {
+  constructor(initialStore: StoreState, mutators: Mutators) {
     this.state = initialStore;
-    this.reducer = reducer;
+    this.mutators = mutators;
   }
 
   registerStoreChangedSubscription = (storeChangedHandler: (storeState: StoreState) => void) => {
@@ -25,7 +25,7 @@ export class SimpleStore<StoreState> {
     this.subscriptions.delete(subscriptionId);
   }
 
-  updateState = (updatedStoreState: StoreState) => {
+  setState = (updatedStoreState: StoreState) => {
     this.state = updatedStoreState;
     this.subscriptions.forEach((changedHandler) => {
       changedHandler(this.state);
@@ -33,4 +33,18 @@ export class SimpleStore<StoreState> {
   }
 
   getState = () => this.state;
+
+  mutate = <MutatorName extends keyof Mutators>(mutatorName: MutatorName, payload: Parameters<ReturnType<Mutators[MutatorName]>>[0]) => {
+    const currentState = this.getState();
+    const updatedState = this.mutators[mutatorName](currentState)(payload);
+    this.setState(updatedState);
+  }
+
+  getMutator: GetMutatorFn<StoreState, Mutators> = (mutatorName) => {
+    const currentState = this.getState();
+    return ((payload): void => {
+      const updatedState = this.mutators[mutatorName](currentState)(payload);
+      this.setState(updatedState);
+    });
+  }
 }

@@ -10,6 +10,25 @@ export const createLocalStoreState = (): StoreState => {
   };
 };
 
-export const localStoreReducer = (state: StoreState) => state;
+const setQuery = (state: StoreState) => (payload: {query: string | null}): StoreState => ({
+  ...state,
+  query: payload.query,
+});
 
-export const {StoreProvider: LocalStoreProvider, StoreConsumer: LocalStoreConsumer, useStore: useLocalStore} = createStoreContext<StoreState>();
+const resetQuery = (state: StoreState) => (payload: {}): StoreState => ({
+  ...state,
+  query: 'shared-context',
+})
+
+export const mutators = {
+  setQuery,
+  resetQuery,
+};
+export type Mutators = typeof mutators;
+
+export const {
+  StoreProvider: LocalStoreProvider, 
+  StoreConsumer: LocalStoreConsumer, 
+  useStore: useLocalStore
+} = createStoreContext<StoreState, Mutators>();
+
