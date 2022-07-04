@@ -1,7 +1,12 @@
 export type SubscriptionId = number & { __type: 'SubscriptionId' };
 export type StoreChangedHandler<StoreState> = (storeState: StoreState) => void;
 export type MutatorsBaseType<StoreState> = {[k: string]: (state: StoreState) => (payload: any) => StoreState};
-export type GetMutatorFn<StoreState, Mutators extends MutatorsBaseType<StoreState>> = (mutatorName: keyof Mutators) => ((payload: Parameters<ReturnType<Mutators[typeof mutatorName]>>[0]) => void);
+export type MutateFn<
+  StoreState,
+  Mutators extends MutatorsBaseType<StoreState>
+> = <MutatorName extends keyof Mutators>(
+  mutatorName: MutatorName, 
+  payload: Parameters<ReturnType<Mutators[MutatorName]>>[0]) => void;
 export class SimpleStore<StoreState, Mutators extends MutatorsBaseType<StoreState>> {
 
   private state: StoreState;
@@ -34,17 +39,9 @@ export class SimpleStore<StoreState, Mutators extends MutatorsBaseType<StoreStat
 
   getState = () => this.state;
 
-  mutate = <MutatorName extends keyof Mutators>(mutatorName: MutatorName, payload: Parameters<ReturnType<Mutators[MutatorName]>>[0]) => {
+  mutate: MutateFn<StoreState, Mutators> = (mutatorName, payload) => {
     const currentState = this.getState();
     const updatedState = this.mutators[mutatorName](currentState)(payload);
     this.setState(updatedState);
-  }
-
-  getMutator: GetMutatorFn<StoreState, Mutators> = (mutatorName) => {
-    const currentState = this.getState();
-    return ((payload): void => {
-      const updatedState = this.mutators[mutatorName](currentState)(payload);
-      this.setState(updatedState);
-    });
   }
 }

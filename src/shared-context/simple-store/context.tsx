@@ -1,16 +1,12 @@
 import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from 'react';
-import { GetMutatorFn, MutatorsBaseType, SimpleStore } from './store';
+import { MutateFn, MutatorsBaseType, SimpleStore } from './store';
 
 type StoreChangedHandler<StoreState> = (store: StoreState) => void;
 
 export const createStoreContext = <StoreState, Mutators extends MutatorsBaseType<StoreState>>() => {
   const context = createContext<{
     storeState: StoreState;
-    mutate: <MutatorName extends keyof Mutators>(
-      mutatorName: MutatorName,
-      payload: Parameters<ReturnType<Mutators[MutatorName]>>[0]
-    ) => void;
-    getMutator: GetMutatorFn<StoreState, Mutators>;
+    mutate: MutateFn<StoreState, Mutators>;
     // mutate: {[ mutatorName: keyof Mutators]: (payload: Parameters<Mutators[typeof mutatorName]>[1]) => void};
   } | null>(null);
 
@@ -41,9 +37,7 @@ export const createStoreContext = <StoreState, Mutators extends MutatorsBaseType
     }, [onStoreChangeSubscription, store]);
 
     return (
-      <context.Provider value={{ storeState, mutate: store.mutate, getMutator: store.getMutator }}>
-        {children}
-      </context.Provider>
+      <context.Provider value={{ storeState, mutate: store.mutate }}>{children}</context.Provider>
     );
   };
 

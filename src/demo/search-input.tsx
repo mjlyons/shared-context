@@ -1,10 +1,16 @@
-import { ChangeEventHandler, KeyboardEventHandler, useCallback, useState } from 'react';
+import { ChangeEventHandler, KeyboardEventHandler, useCallback, useEffect, useState } from 'react';
 import { useLocalStore } from '../shared-context/local-store/store';
 
-export const SearchInput = () => {
-  const localStore = useLocalStore();
-
-  const [inputText, setInputText] = useState<string | null>(localStore?.storeState.query ?? null);
+const ConnectedSearchInput = ({
+  query,
+  setQuery,
+  resetQuery,
+}: {
+  query: string | null;
+  setQuery: (query: string | null) => void;
+  resetQuery: () => void;
+}) => {
+  const [inputText, setInputText] = useState<string | null>(query);
 
   const handleChange: ChangeEventHandler<HTMLInputElement> = useCallback(
     (evt) => {
@@ -17,15 +23,16 @@ export const SearchInput = () => {
     (evt) => {
       if (evt.key === 'Enter') {
         console.log('Submit!');
-        localStore?.mutate('setQuery', { query: inputText });
+        setQuery(inputText);
       }
     },
-    [localStore, inputText]
+    [setQuery, inputText]
   );
 
-  if (!localStore) {
-    return <div>ERROR: forgot to use local store provider</div>;
-  }
+  // Sets query input to active query if the query changes elsewhere
+  useEffect(() => {
+    setInputText(query);
+  }, [setInputText, query]);
 
   return (
     <div>
@@ -36,8 +43,31 @@ export const SearchInput = () => {
         onKeyDown={handleKeyDown}
         value={inputText ?? ''}
       />
-      <button onClick={() => localStore?.mutate('resetQuery', {})}>Reset</button>
-      <div>Current Query: {localStore.storeState.query}</div>
+      <button onClick={resetQuery}>Reset</button>
+      <div>Current Query: {query}</div>
     </div>
+  );
+};
+
+export const SearchInput = () => {
+  const localStore = useLocalStore();
+
+  const setQuery = useCallback(
+    (query: string | null) => localStore?.mutate('setQuery', { query }),
+    [localStore]
+  );
+
+  const resetQuery = useCallback(() => localStore?.mutate('resetQuery', {}), [localStore]);
+
+  if (!localStore) {
+    return <div>ERROR: Forgot to use local store provider</div>;
+  }
+
+  return (
+    <ConnectedSearchInput
+      query={localStore?.storeState.query}
+      setQuery={setQuery}
+      resetQuery={resetQuery}
+    />
   );
 };
