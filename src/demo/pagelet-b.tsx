@@ -1,4 +1,4 @@
-import { SharedContextProvider } from '../shared-context/context';
+import { SharedContextProvider } from './shared-context/context';
 import { LocalStoreState } from './local-store-state';
 import styles from './pagelet-b.module.css';
 import { RepoStatus } from './repo-status';

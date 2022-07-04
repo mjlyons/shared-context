@@ -1,5 +1,5 @@
 import { useQuery } from 'react-query';
-import { useLocalStoreState } from '../local-store/store';
+import { useLocalStoreState } from './local-store/store';
 
 type RepoData = {
   name: string;

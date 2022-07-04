@@ -4,7 +4,7 @@ import {
   StoreState,
   useLocalMutator,
   useLocalStoreState,
-} from '../local-store/store';
+} from './local-store/store';
 
 const ConnectedSearchInput = ({
   query,

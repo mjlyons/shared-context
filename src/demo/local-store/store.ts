@@ -1,5 +1,5 @@
-import { createStoreContext } from "../simple-store/context";
-import { Mutators } from "../simple-store/store";
+import { createStoreContext } from "../../simple-store/context";
+import { Mutators } from "../../simple-store/store";
 
 export type StoreState = {
   query: string | null;
