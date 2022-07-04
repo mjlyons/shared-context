@@ -49,6 +49,9 @@ const ConnectedSearchInput = ({
         value={inputText ?? ''}
       />
       <button onClick={resetQuery}>Reset</button>
+      <a href="https://github.com/mjlyons?tab=repositories" target="_blank">
+        My repos
+      </a>
       <div>Current Query: {query}</div>
     </div>
   );
