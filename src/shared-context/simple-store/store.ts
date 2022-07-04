@@ -7,6 +7,9 @@ export type MutateFn<
 > = <MutatorName extends keyof Mutators>(
   mutatorName: MutatorName, 
   payload: Parameters<ReturnType<Mutators[MutatorName]>>[0]) => void;
+export type BoundMutators<StoreState, Mutators extends MutatorsBaseType<StoreState>> = {
+  [MutatorName in keyof Mutators]: (payload: Parameters<ReturnType<Mutators[MutatorName]>>[0]) => void
+};
 export class SimpleStore<StoreState, Mutators extends MutatorsBaseType<StoreState>> {
 
   private state: StoreState;

@@ -1,4 +1,5 @@
 import { createStoreContext } from "../simple-store/context";
+import { BoundMutators } from "../simple-store/store";
 
 export type StoreState = {
   query: string | null;
@@ -25,10 +26,11 @@ export const mutators = {
   resetQuery,
 };
 export type Mutators = typeof mutators;
+export type BoundLocalMutators = BoundMutators<StoreState, Mutators>;
 
 export const {
   StoreProvider: LocalStoreProvider, 
   StoreConsumer: LocalStoreConsumer, 
-  useStore: useLocalStore
+  useStoreState: useLocalStoreState,
+  useMutator: useLocalMutator,
 } = createStoreContext<StoreState, Mutators>();
-

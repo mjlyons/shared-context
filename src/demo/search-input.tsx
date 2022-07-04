@@ -1,5 +1,9 @@
 import { ChangeEventHandler, KeyboardEventHandler, useCallback, useEffect, useState } from 'react';
-import { useLocalStore } from '../shared-context/local-store/store';
+import {
+  BoundLocalMutators,
+  useLocalMutator,
+  useLocalStoreState,
+} from '../shared-context/local-store/store';
 
 const ConnectedSearchInput = ({
   query,
@@ -7,8 +11,8 @@ const ConnectedSearchInput = ({
   resetQuery,
 }: {
   query: string | null;
-  setQuery: (query: string | null) => void;
-  resetQuery: () => void;
+  setQuery: BoundLocalMutators['setQuery'];
+  resetQuery: BoundLocalMutators['resetQuery'];
 }) => {
   const [inputText, setInputText] = useState<string | null>(query);
 
@@ -23,7 +27,7 @@ const ConnectedSearchInput = ({
     (evt) => {
       if (evt.key === 'Enter') {
         console.log('Submit!');
-        setQuery(inputText);
+        setQuery({ query: inputText });
       }
     },
     [setQuery, inputText]
@@ -50,22 +54,17 @@ const ConnectedSearchInput = ({
 };
 
 export const SearchInput = () => {
-  const localStore = useLocalStore();
+  const localStoreState = useLocalStoreState();
+  const setQuery = useLocalMutator('setQuery');
+  const resetQuery = useLocalMutator('resetQuery');
 
-  const setQuery = useCallback(
-    (query: string | null) => localStore?.mutate('setQuery', { query }),
-    [localStore]
-  );
-
-  const resetQuery = useCallback(() => localStore?.mutate('resetQuery', {}), [localStore]);
-
-  if (!localStore) {
+  if (!localStoreState) {
     return <div>ERROR: Forgot to use local store provider</div>;
   }
 
   return (
     <ConnectedSearchInput
-      query={localStore?.storeState.query}
+      query={localStoreState?.query}
       setQuery={setQuery}
       resetQuery={resetQuery}
     />

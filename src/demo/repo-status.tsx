@@ -1,5 +1,5 @@
 import { useQuery } from 'react-query';
-import { useLocalStore } from '../shared-context/local-store/store';
+import { useLocalStoreState } from '../shared-context/local-store/store';
 
 type RepoData = {
   name: string;
@@ -14,11 +14,11 @@ type RepoError = {
 };
 
 export const RepoStatus = () => {
-  const localStore = useLocalStore();
-  console.log(`RepoStatus query: ${localStore?.storeState.query}`);
+  const localStoreState = useLocalStoreState();
+  console.log(`RepoStatus query: ${localStoreState?.query}`);
 
   // Lifted from `react-query` docs (https://react-query.tanstack.com/overview)
-  const repoName = localStore?.storeState.query;
+  const repoName = localStoreState?.query;
 
   const { isLoading, error, data } = useQuery<RepoData, RepoError>(`repoData:${repoName}`, () => {
     return fetch(`https://api.github.com/repos/mjlyons/${repoName}`).then((res) => res.json());

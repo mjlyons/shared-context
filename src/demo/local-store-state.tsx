@@ -1,9 +1,9 @@
-import { useLocalStore } from '../shared-context/local-store/store';
+import { useLocalStoreState } from '../shared-context/local-store/store';
 
 export const LocalStoreState = () => {
-  const localStore = useLocalStore();
-  if (!localStore) {
+  const localStoreState = useLocalStoreState();
+  if (!localStoreState) {
     return <div>ERROR: missing local store provider</div>;
   }
-  return <div>{JSON.stringify(localStore.storeState)}</div>;
+  return <div>{JSON.stringify(localStoreState)}</div>;
 };

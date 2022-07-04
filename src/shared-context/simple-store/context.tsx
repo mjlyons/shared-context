@@ -43,6 +43,19 @@ export const createStoreContext = <StoreState, Mutators extends MutatorsBaseType
 
   const StoreConsumer = context.Consumer;
   const useStore = () => useContext(context);
+  const useStoreState = () => {
+    const store = useStore();
+    return store?.storeState;
+  };
+  const useMutator = <MutatorName extends keyof Mutators>(mutatorName: MutatorName) => {
+    const store = useStore();
+    return useCallback(
+      (payload: Parameters<ReturnType<Mutators[MutatorName]>>[0]) => {
+        store?.mutate(mutatorName, payload);
+      },
+      [store, mutatorName]
+    );
+  };
 
-  return { StoreProvider, StoreConsumer, useStore };
+  return { StoreProvider, StoreConsumer, useStoreState, useMutator };
 };
