@@ -1,6 +1,7 @@
 import { ChangeEventHandler, KeyboardEventHandler, useCallback, useEffect, useState } from 'react';
 import {
-  BoundLocalMutators,
+  LocalMutators,
+  StoreState,
   useLocalMutator,
   useLocalStoreState,
 } from '../shared-context/local-store/store';
@@ -10,9 +11,9 @@ const ConnectedSearchInput = ({
   setQuery,
   resetQuery,
 }: {
-  query: string | null;
-  setQuery: BoundLocalMutators['setQuery'];
-  resetQuery: BoundLocalMutators['resetQuery'];
+  query: StoreState['query'];
+  setQuery: LocalMutators['setQuery'];
+  resetQuery: LocalMutators['resetQuery'];
 }) => {
   const [inputText, setInputText] = useState<string | null>(query);
 

@@ -1,10 +1,10 @@
 import { QueryClient } from 'react-query';
-import { createLocalStoreState, mutators, Mutators, StoreState } from './local-store/store';
+import { createLocalStoreState, mutators, UnboundLocalMutators, StoreState } from './local-store/store';
 import { SimpleStore } from './simple-store/store';
 
 type ContextManager = {
   reactQueryClient: QueryClient,
-  localStore: SimpleStore<StoreState, Mutators>
+  localStore: SimpleStore<StoreState, UnboundLocalMutators>
 }
 
 let sharedContextManagerSingleton: null | ContextManager = null;

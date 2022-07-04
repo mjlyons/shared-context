@@ -1,25 +1,25 @@
 export type SubscriptionId = number & { __type: 'SubscriptionId' };
 export type StoreChangedHandler<StoreState> = (storeState: StoreState) => void;
-export type MutatorsBaseType<StoreState> = {[k: string]: (state: StoreState) => (payload: any) => StoreState};
+export type UnboundMutatorsBaseType<StoreState> = {[k: string]: (state: StoreState) => (payload: any) => StoreState};
 export type MutateFn<
   StoreState,
-  Mutators extends MutatorsBaseType<StoreState>
-> = <MutatorName extends keyof Mutators>(
+  UnboundMutators extends UnboundMutatorsBaseType<StoreState>
+> = <MutatorName extends keyof UnboundMutators>(
   mutatorName: MutatorName, 
-  payload: Parameters<ReturnType<Mutators[MutatorName]>>[0]) => void;
-export type BoundMutators<StoreState, Mutators extends MutatorsBaseType<StoreState>> = {
-  [MutatorName in keyof Mutators]: (payload: Parameters<ReturnType<Mutators[MutatorName]>>[0]) => void
+  payload: Parameters<ReturnType<UnboundMutators[MutatorName]>>[0]) => void;
+export type Mutators<StoreState, UnboundMutators extends UnboundMutatorsBaseType<StoreState>> = {
+  [MutatorName in keyof UnboundMutators]: (payload: Parameters<ReturnType<UnboundMutators[MutatorName]>>[0]) => void
 };
-export class SimpleStore<StoreState, Mutators extends MutatorsBaseType<StoreState>> {
+export class SimpleStore<StoreState, UnboundMutators extends UnboundMutatorsBaseType<StoreState>> {
 
   private state: StoreState;
-  private mutators: Mutators;
+  private unboundMutators: UnboundMutators;
   private nextSubscriptionId: SubscriptionId = 1 as SubscriptionId;
   private subscriptions: Map<SubscriptionId, StoreChangedHandler<StoreState>> = new Map();
 
-  constructor(initialStore: StoreState, mutators: Mutators) {
+  constructor(initialStore: StoreState, unboundMutators: UnboundMutators) {
     this.state = initialStore;
-    this.mutators = mutators;
+    this.unboundMutators = unboundMutators;
   }
 
   registerStoreChangedSubscription = (storeChangedHandler: (storeState: StoreState) => void) => {
@@ -42,9 +42,9 @@ export class SimpleStore<StoreState, Mutators extends MutatorsBaseType<StoreStat
 
   getState = () => this.state;
 
-  mutate: MutateFn<StoreState, Mutators> = (mutatorName, payload) => {
+  mutate: MutateFn<StoreState, UnboundMutators> = (mutatorName, payload) => {
     const currentState = this.getState();
-    const updatedState = this.mutators[mutatorName](currentState)(payload);
+    const updatedState = this.unboundMutators[mutatorName](currentState)(payload);
     this.setState(updatedState);
   }
 }
