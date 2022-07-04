@@ -1,4 +1,4 @@
-import { useLocalStoreState } from '../shared-context/local-store/store';
+import { useLocalStoreState } from '../local-store/store';
 
 export const LocalStoreState = () => {
   const localStoreState = useLocalStoreState();
