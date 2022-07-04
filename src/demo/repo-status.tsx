@@ -1,4 +1,5 @@
 import { useQuery } from 'react-query';
+import { useLocalStore } from '../shared-context/local-store/store';
 
 type RepoData = {
   name: string;
@@ -13,10 +14,15 @@ type RepoError = {
 };
 
 export const RepoStatus = () => {
+  const localStore = useLocalStore();
+  console.log(`RepoStatus query: ${localStore?.storeState.query}`);
+
   // Lifted from `react-query` docs (https://react-query.tanstack.com/overview)
-  const { isLoading, error, data } = useQuery<RepoData, RepoError>('repoData', () =>
-    fetch('https://api.github.com/repos/mjlyons/shared-context').then((res) => res.json())
-  );
+  const repoName = localStore?.storeState.query;
+
+  const { isLoading, error, data } = useQuery<RepoData, RepoError>(`repoData:${repoName}`, () => {
+    return fetch(`https://api.github.com/repos/mjlyons/${repoName}`).then((res) => res.json());
+  });
 
   if (isLoading) return <>'Loading...'</>;
 
